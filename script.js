@@ -209,66 +209,81 @@ function startPhotoLove() {
   document.getElementById("finalPage").style.display = "none";
   photoLove.style.display = "block";
 
-  // set canvas responsive
   photoLove.width = innerWidth;
   photoLove.height = innerHeight;
 
   let particles = [];
-  const screenScale = Math.min(innerWidth, innerHeight) / 35; // scale relatif layar
-  const density = 0.04; // jarak antar partikel
-  const floatAmplitude = 5; // floating effect
+  const screenScale = Math.min(innerWidth, innerHeight) / 30;
+  const density = 0.1;
+  const floatAmplitude = 4;
 
-  // bikin partikel love
+  // bikin posisi love
+  let targets = [];
   for (let t = 0; t < Math.PI * 2; t += density) {
       const x = 16 * Math.pow(Math.sin(t), 3);
       const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-
-      particles.push({
-          x: Math.random() * innerWidth, // mulai random
-          y: Math.random() * innerHeight,
-          targetX: innerWidth / 2 + x * screenScale + (Math.random() - 0.5) * 5, // offset kecil
-          targetY: innerHeight / 2 - y * screenScale + (Math.random() - 0.5) * 5,
-          img: imgs[Math.floor(Math.random() * imgs.length)],
-          scale: 0,
-          alpha: 0,
-          floatOffset: Math.random() * Math.PI * 2
+      targets.push({
+          x: innerWidth / 2 + x * screenScale,
+          y: innerHeight / 2 - y * screenScale
       });
   }
 
-  let time = 0;
+  let spawnIndex = 0;
+  const spawnInterval = 60;
+  function spawnParticle() {
+      if (spawnIndex >= targets.length) return;
 
+      particles.push({
+          x: innerWidth / 2,
+          y: innerHeight / 2,
+          targetX: targets[spawnIndex].x + (Math.random() - 0.5) * 5,
+          targetY: targets[spawnIndex].y + (Math.random() - 0.5) * 5,
+          img: imgs[Math.floor(Math.random() * imgs.length)],
+          alpha: 0,
+          scale: 0,
+          floatOffset: Math.random() * Math.PI * 2
+      });
+      spawnIndex++;
+      setTimeout(spawnParticle, spawnInterval);
+  }
+  spawnParticle();
+
+  let time = 0;
   function animatePhotoLove() {
       plctx.clearRect(0, 0, photoLove.width, photoLove.height);
       time += 0.02;
 
+      // draw particles (foto)
       particles.forEach(p => {
-          // smooth move ke target
           p.x += (p.targetX - p.x) * 0.08;
           p.y += (p.targetY - p.y) * 0.08;
-
-          // fade in
           p.alpha += (1 - p.alpha) * 0.05;
-
-          // scale naik perlahan
           p.scale += (1 - p.scale) * 0.05;
 
-          // floating effect
           const floatY = Math.sin(time + p.floatOffset) * floatAmplitude;
 
-          // ukur gambar
           const ratio = p.img.width / p.img.height;
-          let size = screenScale * 4 * p.scale; // ukuran partikel lebih besar
+          let size = screenScale * 4 * p.scale;
           let w = size;
           let h = size;
           if (ratio > 1) h = w / ratio;
           else w = h * ratio;
 
-          // draw
           plctx.globalAlpha = p.alpha;
           plctx.shadowColor = "#ff2e88";
           plctx.shadowBlur = 15;
-          plctx.drawImage(p.img, p.x - w / 2, p.y - h / 2 + floatY, w, h);
+          plctx.drawImage(p.img, p.x - w/2, p.y - h/2 + floatY, w, h);
       });
+
+      // draw text inside love
+      const text = "I love you more than you know 💖";
+      plctx.font = "bold " + Math.floor(screenScale * 2.5) + "px Poppins";
+      plctx.fillStyle = "#ff2e88";
+      plctx.textAlign = "center";
+      plctx.textBaseline = "middle";
+      plctx.shadowColor = "#ff2e88";
+      plctx.shadowBlur = 20;
+      plctx.fillText(text, innerWidth / 2, innerHeight / 2);
 
       plctx.globalAlpha = 1;
       plctx.shadowBlur = 0;
@@ -277,15 +292,7 @@ function startPhotoLove() {
   }
 
   animatePhotoLove();
-
-  // swap gambar tiap 2 detik
-  setInterval(() => {
-      particles.forEach(p => {
-          p.img = imgs[Math.floor(Math.random() * imgs.length)];
-      });
-  }, 2000);
 }
-
 // resize canvas saat orientasi HP berubah
 window.addEventListener('resize', () => {
   photoLove.width = innerWidth;
