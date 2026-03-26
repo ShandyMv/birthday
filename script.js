@@ -151,7 +151,7 @@ function showLove(){
   dotCanvas.style.display="none";
   createHeartParticles();
   animateHeart();
-  setTimeout(showFinalPage,3000);
+  setTimeout(showFinalPage,3500);
 }
 
 // ===== FINAL PAGE =====
