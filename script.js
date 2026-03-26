@@ -83,7 +83,7 @@ function drawDotText(text){
   ctx.shadowBlur=0;
 }
 
-const sequence = ["3","2","1","HAPPY","BIRTHDAY","TO","DEWANI 💖"];
+const sequence = ["3","2","1","HAPPY","BIRTHDAY","TO","DEWANI ❤️"];
 let seqIndex = 0;
 
 function next(){
@@ -157,10 +157,14 @@ function showLove(){
 // ===== FINAL PAGE =====
 function showFinalPage(){
   loveCanvas.style.display="none";
-  document.getElementById("finalPage").style.display="flex";
+  const finalPage = document.getElementById("finalPage");
+  
+  // tampilkan & trigger fade in
+  finalPage.style.display = "flex";
+  setTimeout(() => finalPage.classList.add("show"), 50); // delay kecil biar transisi jalan
+  
   startAutoSlider();
 }
-
 // ===== AUTO SLIDER =====
 let index=0;
 const totalSlides=5;

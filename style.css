@@ -14,27 +14,35 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
-    display: none;
+    display: flex;
     flex-direction: column;
     align-items: center;
-  }
-  
-  #title {
-    margin-top: 60px;
+    justify-content: flex-start; /* mulai dari atas */
+    padding-top: 60px; /* jarak dari atas layar */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease-in-out; /* smooth fade in */
+}
+
+/* tampilkan final page */
+#finalPage.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Judul tetap glowing / kotak romantis */
+#title {
     text-align: center;
-    color: white;
-    font-family: 'Playfair Display', serif;
-    font-size: 48px; /* lebih besar */
-    font-weight: bold;
-    text-shadow: 0 0 20px #ff2e88;
-    
-    background: rgba(0,0,0,0.4); /* semi-transparent */
+    color: #fff;
+    font-family: 'Playfair Display';
+    font-size: 32px;
     padding: 20px 40px;
+    background: rgba(255,46,136,0.15); /* box transparan romantis */
     border-radius: 20px;
-    border: 2px solid #ff2e88;
-    box-shadow: 0 0 25px rgba(255,46,136,0.6);
-    display: inline-block;
-  }
+    text-shadow: 0 0 15px #ff2e88;
+    box-shadow: 0 0 25px rgba(255,46,136,0.5);
+    margin-bottom: 40px; /* jarak ke slider */
+}
   
   #title span {
     display: block;
