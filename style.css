@@ -23,14 +23,26 @@ body {
     margin-top: 60px;
     text-align: center;
     color: white;
-    font-family: 'Playfair Display';
-    font-size: 30px;
+    font-family: 'Playfair Display', serif;
+    font-size: 48px; /* lebih besar */
+    font-weight: bold;
     text-shadow: 0 0 20px #ff2e88;
+    
+    background: rgba(0,0,0,0.4); /* semi-transparent */
+    padding: 20px 40px;
+    border-radius: 20px;
+    border: 2px solid #ff2e88;
+    box-shadow: 0 0 25px rgba(255,46,136,0.6);
+    display: inline-block;
   }
   
   #title span {
-    font-family: 'Poppins';
-    font-size: 15px;
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px; /* lebih besar */
+    margin-top: 10px;
+    color: #ffbad0;
+    text-shadow: 0 0 15px #ff2e88;
   }
   
   /* ===== SLIDER ===== */

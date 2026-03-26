@@ -210,16 +210,15 @@ function startPhotoLove() {
   photoLove.style.display = "block";
 
   let particles = [];
-  const size = 140; // lebih besar
-  const density = 0.04; // kurangi kepadatan supaya tidak menumpuk
+  const baseSize = Math.min(innerWidth, innerHeight) / 5; // partikel lebih besar & responsive
+  const density = 0.03; // partikel lebih tersebar
 
   for (let t = 0; t < Math.PI * 2; t += density) {
       let x = 16 * Math.pow(Math.sin(t), 3);
       let y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
 
-      // tambahkan offset acak agar partikel tidak terlalu bertumpuk
-      let offsetX = (Math.random() - 0.5) * 60;
-      let offsetY = (Math.random() - 0.5) * 60;
+      let offsetX = (Math.random() - 0.5) * 80;
+      let offsetY = (Math.random() - 0.5) * 80;
 
       particles.push({
           x: Math.random() * innerWidth,
@@ -239,22 +238,16 @@ function startPhotoLove() {
       time += 0.03;
 
       particles.forEach(p => {
-          // smooth move ke target
           p.x += (p.targetX - p.x) * 0.07;
           p.y += (p.targetY - p.y) * 0.07;
-
-          // fade in
           p.alpha += (1 - p.alpha) * 0.05;
-
-          // scale up
           p.scale += (1 - p.scale) * 0.05;
 
-          // floating effect
-          let floatY = Math.sin(time + p.x * 0.01) * 4;
+          let floatY = Math.sin(time + p.x * 0.01) * 6; // floating effect lebih halus
 
           let ratio = p.img.width / p.img.height;
-          let w = size * p.scale;
-          let h = size * p.scale;
+          let w = baseSize * p.scale;
+          let h = baseSize * p.scale;
           if (ratio > 1) h = w / ratio;
           else w = h * ratio;
 
