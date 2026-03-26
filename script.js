@@ -156,14 +156,18 @@ function showLove(){
 
 // ===== FINAL PAGE =====
 function showFinalPage(){
-  loveCanvas.style.display="none";
-  const finalPage = document.getElementById("finalPage");
-  
-  // tampilkan & trigger fade in
-  finalPage.style.display = "flex";
-  setTimeout(() => finalPage.classList.add("show"), 50); // delay kecil biar transisi jalan
-  
+  loveCanvas.style.display = "none";
+  const final = document.getElementById("finalPage");
+  final.style.display = "flex";
+  setTimeout(()=> final.classList.add("show"), 50); // fade in smooth
   startAutoSlider();
+
+  // play audio
+  const audio = document.getElementById("finalAudio");
+  audio.currentTime = 0; // mulai dari awal
+  audio.play().catch(e=>{
+    console.log("Audio tidak bisa auto play, mungkin perlu interaksi user.", e);
+  });
 }
 // ===== AUTO SLIDER =====
 let index=0;
