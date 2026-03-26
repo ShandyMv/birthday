@@ -209,25 +209,29 @@ function startPhotoLove() {
   document.getElementById("finalPage").style.display = "none";
   photoLove.style.display = "block";
 
+  // set canvas responsive
+  photoLove.width = innerWidth;
+  photoLove.height = innerHeight;
+
   let particles = [];
-  const baseSize = Math.min(innerWidth, innerHeight) / 5; // partikel lebih besar & responsive
-  const density = 0.03; // partikel lebih tersebar
+  const screenScale = Math.min(innerWidth, innerHeight) / 35; // scale relatif layar
+  const density = 0.04; // jarak antar partikel
+  const floatAmplitude = 5; // floating effect
 
+  // bikin partikel love
   for (let t = 0; t < Math.PI * 2; t += density) {
-      let x = 16 * Math.pow(Math.sin(t), 3);
-      let y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-
-      let offsetX = (Math.random() - 0.5) * 80;
-      let offsetY = (Math.random() - 0.5) * 80;
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
 
       particles.push({
-          x: Math.random() * innerWidth,
+          x: Math.random() * innerWidth, // mulai random
           y: Math.random() * innerHeight,
-          targetX: innerWidth / 2 + x * 25 + offsetX,
-          targetY: innerHeight / 2 - y * 25 + offsetY,
+          targetX: innerWidth / 2 + x * screenScale + (Math.random() - 0.5) * 5, // offset kecil
+          targetY: innerHeight / 2 - y * screenScale + (Math.random() - 0.5) * 5,
           img: imgs[Math.floor(Math.random() * imgs.length)],
           scale: 0,
-          alpha: 0
+          alpha: 0,
+          floatOffset: Math.random() * Math.PI * 2
       });
   }
 
@@ -235,30 +239,40 @@ function startPhotoLove() {
 
   function animatePhotoLove() {
       plctx.clearRect(0, 0, photoLove.width, photoLove.height);
-      time += 0.03;
+      time += 0.02;
 
       particles.forEach(p => {
-          p.x += (p.targetX - p.x) * 0.07;
-          p.y += (p.targetY - p.y) * 0.07;
+          // smooth move ke target
+          p.x += (p.targetX - p.x) * 0.08;
+          p.y += (p.targetY - p.y) * 0.08;
+
+          // fade in
           p.alpha += (1 - p.alpha) * 0.05;
+
+          // scale naik perlahan
           p.scale += (1 - p.scale) * 0.05;
 
-          let floatY = Math.sin(time + p.x * 0.01) * 6; // floating effect lebih halus
+          // floating effect
+          const floatY = Math.sin(time + p.floatOffset) * floatAmplitude;
 
-          let ratio = p.img.width / p.img.height;
-          let w = baseSize * p.scale;
-          let h = baseSize * p.scale;
+          // ukur gambar
+          const ratio = p.img.width / p.img.height;
+          let size = screenScale * 4 * p.scale; // ukuran partikel lebih besar
+          let w = size;
+          let h = size;
           if (ratio > 1) h = w / ratio;
           else w = h * ratio;
 
+          // draw
           plctx.globalAlpha = p.alpha;
           plctx.shadowColor = "#ff2e88";
-          plctx.shadowBlur = 25;
+          plctx.shadowBlur = 15;
           plctx.drawImage(p.img, p.x - w / 2, p.y - h / 2 + floatY, w, h);
       });
 
       plctx.globalAlpha = 1;
       plctx.shadowBlur = 0;
+
       requestAnimationFrame(animatePhotoLove);
   }
 
@@ -271,3 +285,9 @@ function startPhotoLove() {
       });
   }, 2000);
 }
+
+// resize canvas saat orientasi HP berubah
+window.addEventListener('resize', () => {
+  photoLove.width = innerWidth;
+  photoLove.height = innerHeight;
+});
