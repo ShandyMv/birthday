@@ -94,84 +94,70 @@ function next(){
 next();
 
 
-// ===== HEART =====
+// ===== HEART FULL =====
 const loveCanvas = document.getElementById("loveCanvas");
 const lctx = loveCanvas.getContext("2d");
 
 loveCanvas.width = innerWidth;
 loveCanvas.height = innerHeight;
 
-function drawHeart(){
-  lctx.clearRect(0,0,loveCanvas.width,loveCanvas.height);
+let heartParticles = [];
 
-  for(let t=0; t<Math.PI*2; t+=0.02){
+function createHeartParticlesFull() {
+  heartParticles = [];
+  const density = 0.015;
+  const size = 16;
+  const scale = Math.min(innerWidth, innerHeight)/35;
+
+  for(let t=0; t<Math.PI*2; t+=density){
     let x = 16*Math.pow(Math.sin(t),3);
-    let y = 13*Math.cos(t)
-      -5*Math.cos(2*t)
-      -2*Math.cos(3*t)
-      -Math.cos(4*t);
+    let y = 13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t);
 
-    lctx.fillStyle="#ff2e88";
-    lctx.fillRect(innerWidth/2 + x*15, innerHeight/2 - y*15, 4,4);
-  }
-}
-
-function showLove(){
-  dotCanvas.style.display="none";
-  drawHeart();
-  setTimeout(showFinalPage,1500);
-}
-
-
-// ===== FINAL PAGE =====
-function showFinalPage(){
-  loveCanvas.style.display="none";
-  document.getElementById("finalPage").style.display="flex";
-  startAutoSlider();
-}
-
-
-// ===== AUTO SLIDER =====
-let index = 0;
-const totalSlides = 5;
-
-function startAutoSlider(){
-  const slides = document.getElementById("slides");
-  const dotsContainer = document.getElementById("dots");
-
-  dotsContainer.innerHTML = "";
-
-  for(let i=0;i<totalSlides;i++){
-    let dot = document.createElement("div");
-    dot.classList.add("dot");
-    if(i===0) dot.classList.add("active");
-    dotsContainer.appendChild(dot);
-  }
-
-  function updateSlider(){
-    slides.style.transform = `translateX(-${index*100}%)`;
-
-    document.querySelectorAll(".dot").forEach((d,i)=>{
-      d.classList.toggle("active", i===index);
-    });
-  }
-
-  function nextSlide(){
-    index++;
-    updateSlider();
-
-    if(index < totalSlides){
-      setTimeout(nextSlide, 2000);
-    } else {
-      setTimeout(startPhotoLove, 800);
+    for(let i=0;i<4;i++){
+      heartParticles.push({
+        x: Math.random()*innerWidth,
+        y: Math.random()*innerHeight,
+        targetX: innerWidth/2 + x*scale + (Math.random()-0.5)*10,
+        targetY: innerHeight/2 - y*scale + (Math.random()-0.5)*10,
+        size: size,
+        alpha: 0
+      });
     }
   }
+}
 
-  setTimeout(nextSlide, 1500);
+function animateHeartFull() {
+  lctx.clearRect(0,0,loveCanvas.width,loveCanvas.height);
+
+  heartParticles.forEach(p=>{
+    p.x += (p.targetX - p.x)*0.08;
+    p.y += (p.targetY - p.y)*0.08;
+
+    p.alpha += (1 - p.alpha)*0.05;
+
+    lctx.shadowColor = "#ff2e88";
+    lctx.shadowBlur = 25;
+
+    lctx.globalAlpha = p.alpha;
+    lctx.fillStyle = "#ff2e88";
+    lctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
+  });
+
+  lctx.globalAlpha = 1;
+  lctx.shadowBlur = 0;
+
+  requestAnimationFrame(animateHeartFull);
+}
+
+function showLove() {
+  dotCanvas.style.display="none";
+  createHeartParticlesFull();
+  animateHeartFull();
+  setTimeout(showFinalPage, 3000); // setelah 3 detik lanjut slider + tulisan
 }
 
 
-// ===== PHOTO → LOVE (LEBIH BESAR) =====
+// ===== FINAL PAGE + SLIDER =====
 const photoLove = document.getElementById("photoLove");
 const plctx = photoLove.getContext("2d");
 
@@ -185,86 +171,110 @@ const imgs = [];
   imgs.push(img);
 });
 
-function startPhotoLove(){
-    document.getElementById("finalPage").style.display="none";
-    photoLove.style.display="block";
-  
-    let particles = [];
-  
-    const size = 85;
-    const density = 0.07;
-  
-    for(let t=0; t<Math.PI*2; t+=density){
-  
-      let x = 16*Math.pow(Math.sin(t),3);
-      let y = 13*Math.cos(t)
-        -5*Math.cos(2*t)
-        -2*Math.cos(3*t)
-        -Math.cos(4*t);
-  
-      particles.push({
-        x: Math.random()*innerWidth,
-        y: Math.random()*innerHeight,
-        targetX: innerWidth/2 + x*22,
-        targetY: innerHeight/2 - y*22,
-        img: imgs[Math.floor(Math.random()*imgs.length)],
-        scale: 0,
-        alpha: 0
-      });
-    }
-  
-    let time = 0;
-  
-    function animate(){
-      plctx.clearRect(0,0,photoLove.width,photoLove.height);
-  
-      time += 0.03;
-  
-      particles.forEach(p=>{
-        // gerakan masuk smooth
-        p.x += (p.targetX - p.x)*0.07;
-        p.y += (p.targetY - p.y)*0.07;
-  
-        // fade in
-        p.alpha += (1 - p.alpha)*0.05;
-  
-        // scale up (muncul pelan)
-        p.scale += (1 - p.scale)*0.05;
-  
-        // efek floating halus
-        let floatY = Math.sin(time + p.x * 0.01) * 3;
-  
-        let ratio = p.img.width / p.img.height;
-  
-        let w = size * p.scale;
-        let h = size * p.scale;
-  
-        if(ratio > 1){
-          h = w / ratio;
-        } else {
-          w = h * ratio;
-        }
-  
-        plctx.globalAlpha = p.alpha;
-  
-        // glow
-        plctx.shadowColor = "#ff2e88";
-        plctx.shadowBlur = 20;
-  
-        plctx.drawImage(
-          p.img,
-          p.x - w/2,
-          p.y - h/2 + floatY,
-          w,
-          h
-        );
-      });
-  
-      plctx.globalAlpha = 1;
-      plctx.shadowBlur = 0;
-  
-      requestAnimationFrame(animate);
-    }
-  
-    animate();
+let index = 0;
+const totalSlides = 5;
+
+function showFinalPage(){
+  loveCanvas.style.display="none"; // sembunyikan heart full
+  document.getElementById("finalPage").style.display="flex";
+
+  // setup dots
+  const slides = document.getElementById("slides");
+  const dotsContainer = document.getElementById("dots");
+  dotsContainer.innerHTML = "";
+  for(let i=0;i<totalSlides;i++){
+    let dot = document.createElement("div");
+    dot.classList.add("dot");
+    if(i===0) dot.classList.add("active");
+    dotsContainer.appendChild(dot);
   }
+
+  function updateSlider(){
+    slides.style.transform = `translateX(-${index*100}%)`;
+    document.querySelectorAll(".dot").forEach((d,i)=>{
+      d.classList.toggle("active", i===index);
+    });
+  }
+
+  function nextSlide(){
+    index++;
+    updateSlider();
+
+    if(index < totalSlides){
+      setTimeout(nextSlide, 2000);
+    } else {
+      setTimeout(startPhotoLove, 800); // setelah slide terakhir -> PhotoLove
+    }
+  }
+
+  setTimeout(nextSlide, 1500);
+}
+
+
+// ===== PHOTOLOVE FULL =====
+function startPhotoLove(){
+  document.getElementById("finalPage").style.display="none"; // sembunyikan HTML
+  photoLove.style.display="block";
+
+  const sizeBase = 150; // ukuran foto
+  const density = 0.07;
+
+  let particles = [];
+
+  for(let t=0; t<Math.PI*2; t+=density){
+    let x = 16*Math.pow(Math.sin(t),3);
+    let y = 13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t);
+
+    particles.push({
+      x: Math.random()*innerWidth,
+      y: Math.random()*innerHeight,
+      targetX: innerWidth/2 + x*20, // bentuk love lebih kecil dari sebelumnya
+      targetY: innerHeight/2 - y*20,
+      img: imgs[Math.floor(Math.random()*imgs.length)],
+      scale: 0,
+      alpha: 0
+    });
+  }
+
+  let time = 0;
+
+  function animatePhotoLove(){
+    plctx.clearRect(0,0,photoLove.width,photoLove.height);
+    time += 0.03;
+
+    particles.forEach(p=>{
+      p.x += (p.targetX - p.x)*0.07;
+      p.y += (p.targetY - p.y)*0.07;
+
+      p.alpha += (1 - p.alpha)*0.05;
+      p.scale += (1 - p.scale)*0.05;
+
+      let floatY = Math.sin(time + p.x*0.01)*5;
+
+      let ratio = p.img.width/p.img.height;
+      let w = sizeBase*p.scale;
+      let h = sizeBase*p.scale;
+      if(ratio>1) h = w/ratio; else w = h*ratio;
+
+      plctx.globalAlpha = p.alpha;
+      plctx.shadowColor = "#ff2e88";
+      plctx.shadowBlur = 20;
+
+      plctx.drawImage(p.img, p.x - w/2, p.y - h/2 + floatY, w, h);
+    });
+
+    plctx.globalAlpha = 1;
+    plctx.shadowBlur = 0;
+
+    requestAnimationFrame(animatePhotoLove);
+  }
+
+  animatePhotoLove();
+
+  // swap gambar tiap 2 detik
+  setInterval(()=>{
+    particles.forEach(p=>{
+      p.img = imgs[Math.floor(Math.random()*imgs.length)];
+    });
+  },2000);
+}
